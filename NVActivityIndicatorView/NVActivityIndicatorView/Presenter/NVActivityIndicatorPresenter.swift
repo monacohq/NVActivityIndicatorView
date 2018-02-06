@@ -267,6 +267,6 @@ public final class NVActivityIndicatorPresenter {
     }
 }
 
-extension Notification.Name {
+public extension Notification.Name {
     static let NVActivityIndicatorPresenterAnimatingNotification = Notification.Name("NVActivityIndicatorPresenterAnimatingNotification")
 }
