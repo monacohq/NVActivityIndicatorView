@@ -81,16 +81,16 @@ public final class ActivityData {
      - returns: The information package used to display UI blocker.
      */
     public init(size: CGSize? = nil,
-                message: String? = nil,
-                messageFont: UIFont? = nil,
-                messageSpacing: CGFloat? = nil,
-                type: NVActivityIndicatorType? = nil,
-                color: UIColor? = nil,
-                padding: CGFloat? = nil,
-                displayTimeThreshold: Int? = nil,
-                minimumDisplayTime: Int? = nil,
-                backgroundColor: UIColor? = nil,
-                textColor: UIColor? = nil) {
+        message: String? = nil,
+        messageFont: UIFont? = nil,
+        messageSpacing: CGFloat? = nil,
+        type: NVActivityIndicatorType? = nil,
+        color: UIColor? = nil,
+        padding: CGFloat? = nil,
+        displayTimeThreshold: Int? = nil,
+        minimumDisplayTime: Int? = nil,
+        backgroundColor: UIColor? = nil,
+        textColor: UIColor? = nil) {
         self.size = size ?? NVActivityIndicatorView.DEFAULT_BLOCKER_SIZE
         self.message = message ?? NVActivityIndicatorView.DEFAULT_BLOCKER_MESSAGE
         self.messageFont = messageFont ?? NVActivityIndicatorView.DEFAULT_BLOCKER_MESSAGE_FONT
@@ -131,7 +131,7 @@ public final class NVActivityIndicatorPresenter {
     /// Shared instance of `NVActivityIndicatorPresenter`.
     public static let sharedInstance = NVActivityIndicatorPresenter()
 
-    private init() {}
+    private init() { }
 
     // MARK: - Public interface
 
@@ -143,6 +143,7 @@ public final class NVActivityIndicatorPresenter {
     public final func startAnimating(_ data: ActivityData) {
         guard state == .hidden else { return }
 
+        NotificationCenter.default.post(name: .NVActivityIndicatorPresenterAnimatingNotification, object: true)
         state = .waitingToShow
         startAnimatingGroup.enter()
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(data.displayTimeThreshold)) {
@@ -161,6 +162,7 @@ public final class NVActivityIndicatorPresenter {
      Remove UI blocker.
      */
     public final func stopAnimating() {
+        NotificationCenter.default.post(name: .NVActivityIndicatorPresenterAnimatingNotification, object: false)
         _hide()
     }
 
@@ -258,9 +260,13 @@ public final class NVActivityIndicatorPresenter {
         guard let keyWindow = UIApplication.shared.keyWindow else { return }
 
         for item in keyWindow.subviews
-            where item.restorationIdentifier == restorationIdentifier {
+        where item.restorationIdentifier == restorationIdentifier {
             item.removeFromSuperview()
         }
         state = .hidden
     }
+}
+
+extension Notification.Name {
+    static let NVActivityIndicatorPresenterAnimatingNotification = Notification.Name("NVActivityIndicatorPresenterAnimatingNotification")
 }
